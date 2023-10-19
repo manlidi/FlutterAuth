@@ -113,18 +113,31 @@ class _InscriptionPageState extends State<InscriptionPage> {
   }
 
   Future<void> registerUser(String username, String email, String password) async {
-    final url =
-        Uri.parse('http://127.0.0.1:8000/api/register/');
+    try{
+      final url = Uri.parse('http://127.0.0.1:8000/api/register/'); 
 
-    final response = await http.post(
-      url,
-      body: {
-        'username': username,
-        'email': email,
-        'password': password,
-      },
-    );
-
-    print(response.statusCode);
+      final response = await http.post(
+        url,
+        body: {
+          'username': username,
+          'email': email,
+          'password': password,
+        },
+      );
+      
+      if (response.statusCode == 201) {
+        Navigator.of(context).pushReplacementNamed('/connexion');
+      } else {
+          print("Erreur lors de l'inscription. Code de statut : ${response.statusCode}");
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Inscription échouée')));
+      }
+    }on http.ClientException catch (e, stackTrace) {
+      print('Erreur ClientException: $e');
+      print('StackTrace: $stackTrace');
+    }catch (e, stackTrace) {
+      print('Erreur inattendue: $e');
+      print('StackTrace: $stackTrace');
+    }
   }
 }
